@@ -1,0 +1,17 @@
+{
+    "name": "alanvdb/chiphpmunk",
+    "description": "PHP framework",
+    "type": "framework",
+    "authors": [
+        {
+            "name": "AlanVdb",
+            "email": "alanvdb.coder@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Chiphpmunk\\": "src/"
+        }
+    },
+    "require": {}
+}
