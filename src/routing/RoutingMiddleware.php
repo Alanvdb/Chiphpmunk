@@ -1,16 +1,14 @@
 <?php
 
-namespace Chiphpmunk\Error;
+namespace Chiphpmunk\Routing;
 
 use Chiphpmunk\Http\ServerRequestInterface;
 use Chiphpmunk\Http\ResponseInterface;
-use Chiphpmunk\Middleware\MiddlewareInterface;
+use Chiphpmunk\Http\Response;
 use Chiphpmunk\Middleware\DispatcherInterface;
+use Chiphpmunk\Middleware\MiddlewareInterface;
 
-use Throwable;
-use RuntimeException;
-
-class ThrowableHandlerMiddleware implements MiddlewareInterface
+class RoutingMiddleware extends Router implements MiddlewareInterface
 {
     /**
      * Process an HTTP request to produce an HTTP response.
@@ -23,14 +21,10 @@ class ThrowableHandlerMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, DispatcherInterface $dispatcher) : ResponseInterface
     {
-        try {
-            $response = $dispatcher->handle($request);
-            if (!$response instanceof ResponseInterface) {
-                throw new RuntimeException('Middleware dispatcher did not return any response.');
-            }
-            return $response;
-        } catch (Throwable $t) {
-            throw new \Exception('Throwable catched !', 0, $t);
-        }
+        $router = $request->getAttribute('router');
+        
+        $response = new Response();
+        $response->getBody()->write('Hello world !');
+        return $response;
     }
 }
