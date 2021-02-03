@@ -5,6 +5,9 @@ namespace Chiphpmunk;
 use Chiphpmunk\Http\ServerRequestInterface;
 use Chiphpmunk\Http\ResponseInterface;
 
+use Chiphpmunk\Routing\Router;
+use Chiphpmunk\View\PhpRenderer;
+
 use Chiphpmunk\Middleware\Dispatcher;
 use Chiphpmunk\Error\ThrowableHandlerMiddleware;
 use Chiphpmunk\Configuration\ConfigurationLoaderMiddleware;
@@ -45,6 +48,11 @@ class App
             new ConfigurationLoaderMiddleware(),
             new PhpSessionMiddleware(),
             new RoutingMiddleware()
-        ))->handle($request->withAttribute('config', $this->config));
+        ))->handle(
+            $request
+                ->withAttribute('config', $this->config)
+                ->withAttribute('router', new Router())
+                ->withAttribute('renderer', new PhpRenderer())
+            );
     }
 }

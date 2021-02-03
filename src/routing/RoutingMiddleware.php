@@ -23,8 +23,8 @@ class RoutingMiddleware extends Router implements MiddlewareInterface
     {
         $router = $request->getAttribute('router');
         
-        $response = new Response();
-        $response->getBody()->write('Hello world !');
-        return $response;
+        $route = $router->catch($request->getMethod(), $request->getUri()->getPath());
+        $target = $route->getTarget();
+        return $target($request);
     }
 }
