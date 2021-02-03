@@ -8,6 +8,7 @@ use Chiphpmunk\Http\ResponseInterface;
 use Chiphpmunk\Middleware\Dispatcher;
 use Chiphpmunk\Error\ThrowableHandlerMiddleware;
 use Chiphpmunk\Configuration\ConfigurationLoaderMiddleware;
+use Chiphpmunk\Session\PhpSessionMiddleware;
 use Chiphpmunk\Routing\RoutingMiddleware;
 
 class App
@@ -42,6 +43,7 @@ class App
         return (new Dispatcher(
             new ThrowableHandlerMiddleware(),
             new ConfigurationLoaderMiddleware(),
+            new PhpSessionMiddleware(),
             new RoutingMiddleware()
         ))->handle($request->withAttribute('config', $this->config));
     }
