@@ -94,7 +94,7 @@ class ConfigurationLoaderMiddleware implements MiddlewareInterface
             }
             $module = new $moduleClass();
             if (!$module instanceof ModuleInterface) {
-                throw new RuntimeException('Module classes must extend "' . Module::class . '" abstract class.');
+                throw new RuntimeException('Module classes must implement "' . ModuleInterface::class . '" interface.');
             }
             $module->mapRoutes($request->getAttribute('router'));
             $module->mapViews($request->getAttribute('renderer'));
