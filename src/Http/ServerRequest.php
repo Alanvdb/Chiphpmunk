@@ -35,23 +35,9 @@ class ServerRequest extends Request implements ServerRequestInterface
     private $parsedBody;
 
     /**
-     * @var Container $container Container with attributes derived from the request
+     * @var mixed[] $attributes An associative array of attributes
      */
-    private $container;
-
-    // =================================================================================================================
-    //
-    //      METHODS
-    //
-    // =================================================================================================================
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->container = new Container();
-    }
+    private $attributes = [];
 
     // -----------------------------------------------------------------------------------------------------------------
     //      METHODS > GLOBALS
@@ -158,10 +144,8 @@ class ServerRequest extends Request implements ServerRequestInterface
     private function assertQueryValue(array $values) : bool
     {
         foreach ($values as $value) {
-            if (!is_string($value)) {
-                if(!is_array($value) || !$this->assertQueryValue($value)) {
-                    return false;
-                }
+            if (!is_string($value) && (!is_array($value) || !$this->assertQueryValue($value))) {
+                return false;
             }
         }
         return true;
@@ -419,7 +403,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getAttribute(string $name, $default = null)
     {
-        return $this->container->has($name) ? $this->container->get($name) : $default;
+        return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
 
     /**
@@ -435,7 +419,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getAttributes() : array
     {
-        return $this->container->getAll();
+        return $this->attributes;
     }
 
     /**
@@ -450,8 +434,12 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function withAttribute(string $name, $value) : ServerRequestInterface
     {
-        $this->container->set($name, $value);
-        return $this;
+        if (array_key_exists($name, $this->attributes) && $this->attributes[$name] === $value) {
+            return $this;
+        }
+        $clone = clone $this;
+        $clone->attributes[$name] = $value;
+        return $clone;
     }
 
     /**
@@ -463,9 +451,11 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function withoutAttribute(string $name) : ServerRequestInterface
     {
-        if ($this->container->has($name)) {
-            $this->container->unset($name);
+        if (!array_key_exists($name, $this->attributes)) {
+            return $this;
         }
-        return $this;
+        $clone = clone $this;
+        unset($clone->attributes[$name]);
+        return $clone;
     }
 }
