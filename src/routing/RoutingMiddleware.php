@@ -22,7 +22,6 @@ class RoutingMiddleware extends Router implements MiddlewareInterface
     public function process(ServerRequestInterface $request, DispatcherInterface $dispatcher) : ResponseInterface
     {
         $router = $request->getAttribute('router');
-        
         $route = $router->catch($request->getMethod(), $request->getUri()->getPath());
         $target = $route->getTarget();
         return $target($request);

@@ -91,6 +91,7 @@ class ClientRequest extends Request
     {
         if ($this->session !== null) {
             curl_close($this->session);
+            $this->session = null;
         }
     }
 
@@ -121,7 +122,7 @@ class ClientRequest extends Request
 
         $options = [
             CURLOPT_DEFAULT_PROTOCOL => 'http',
-            CURLOPT_ENCODING         => '',
+            CURLOPT_ENCODING         => 'utf-8',
             CURLOPT_PORT             => 80
         ];
 
