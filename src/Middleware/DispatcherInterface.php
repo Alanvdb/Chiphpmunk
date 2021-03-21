@@ -2,9 +2,7 @@
 
 namespace Chiphpmunk\Middleware;
 
-use Chiphpmunk\Http\ServerRequestHandlerInterface;
-
-interface DispatcherInterface extends ServerRequestHandlerInterface
+interface DispatcherInterface
 {
     /**
      * @param MiddlewareInterface ...$middlewares Middleware queue

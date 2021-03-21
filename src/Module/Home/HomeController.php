@@ -14,7 +14,7 @@ class HomeController extends Controller
      */
     public function index() : Response
     {
-        $renderer = $this->request->getAttribute('renderer');
+        $renderer = $this->components->getRenderer();
 
         $document = $renderer->render('index@home');
 

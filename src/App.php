@@ -5,54 +5,69 @@ namespace Chiphpmunk;
 use Chiphpmunk\Http\ServerRequestInterface;
 use Chiphpmunk\Http\ResponseInterface;
 
+use Chiphpmunk\App\Components;
 use Chiphpmunk\Routing\Router;
 use Chiphpmunk\View\PhpRenderer;
 
 use Chiphpmunk\Middleware\Dispatcher;
 use Chiphpmunk\Error\ThrowableHandlerMiddleware;
-use Chiphpmunk\Configuration\ConfigurationLoaderMiddleware;
+use Chiphpmunk\Module\ModuleLoaderMiddleware;
 use Chiphpmunk\Session\PhpSessionMiddleware;
 use Chiphpmunk\Routing\RoutingMiddleware;
+
+use Exception;
+use RuntimeException;
 
 class App
 {
     /**
-     * @var string $config Configuration file path
+     * @const string DEFAULT_CONFIG Default configuration file
      */
-    private $config;
-
-    /**
-     * Constructor
-     * 
-     * @param string $configFile Configuration file
-     * If no file is provided, application will use the default configuration
-     */
-    public function __construct(string $configFile = '')
-    {
-        $this->config = $configFile;
-    }
+    private const DEFAULT_CONFIG = __DIR__ . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'default.php';
 
     /**
      * Runs application
      * 
-     * @param ServerRequestInterface $request Incoming HTTP request
+     * @param ServerRequestInterface $request    Incoming HTTP request
+     * @param string                 $configFile The configuration file
      * 
-     * @throws RuntimeException If no modules were provided in the configuration file
+     * @throws RuntimeException On error with configuration file
      * 
      * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request) : ResponseInterface
+    public function process(ServerRequestInterface $request, string $configFile = '') : ResponseInterface
     {
+        if ($configFile === '') {
+            if (!is_file(self::DEFAULT_CONFIG)) {
+                throw new RuntimeException('Default configuration file is missing: "' . self::DEFAULT_CONFIG . '".');
+            }
+            $configFile = self::DEFAULT_CONFIG;
+        }
+        if (!is_file($configFile)) {
+            throw new RuntimeException('Cannot retrieve configuration file: "' . $configFile . '".');
+        }
+        $config = require $configFile;
+        if (!is_array($config)) {
+            throw new RuntimeException('Configuration file must return an array.');
+        }
+
+        $components = (new Components())
+            ->setRequest($request)
+            ->setRouter(new Router())
+            ->setRenderer(new PhpRenderer());
+
+        try {
+            foreach ($config as $offset => $value) {
+                $components->setConfig($offset, $value);
+            }
+        } catch (Exception $e) {
+            throw new RuntimeException('An error occured loading provided configuration', 0, $e);
+        }
         return (new Dispatcher(
             new ThrowableHandlerMiddleware(),
-            new ConfigurationLoaderMiddleware(),
+            new ModuleLoaderMiddleware(),
             new PhpSessionMiddleware(),
             new RoutingMiddleware()
-        ))->handle(
-            $request
-                ->withAttribute('config', $this->config)
-                ->withAttribute('router', new Router())
-                ->withAttribute('renderer', new PhpRenderer())
-            );
+        ))->handle($components);
     }
 }

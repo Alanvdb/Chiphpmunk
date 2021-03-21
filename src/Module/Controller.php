@@ -2,22 +2,22 @@
 
 namespace Chiphpmunk\Module;
 
-use Chiphpmunk\Http\ServerRequestInterface;
+use Chiphpmunk\App\Components;
 
 abstract class Controller
 {
     /**
-     * @var ServerRequestInterface $request Incoming HTTP request
+     * @var Components $components Application components
      */
-    protected $request;
+    protected $components;
     
     /**
      * Constructor
      * 
-     * @param ServerRequestInterface $request Incoming HTTP request
+     * @param Components $components Application components
      */
-    public function __construct(ServerRequestInterface $request)
+    public function __construct(Components $components)
     {
-        $this->request = $request;
+        $this->components = $components;
     }
 }

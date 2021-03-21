@@ -2,7 +2,7 @@
 
 namespace Chiphpmunk\Middleware;
 
-use Chiphpmunk\Http\ServerRequestInterface;
+use Chiphpmunk\App\Components;
 use Chiphpmunk\Http\ResponseInterface;
 
 use InvalidArgumentException;
@@ -41,17 +41,17 @@ class Dispatcher implements DispatcherInterface
     /**
      * Handles a request and produces a response.
      *
-     * @param ServerRequestInterface $request Incoming HTTP request
+     * @param Components $components Application components
      * 
      * @throws RuntimeException If no response were returned
      *
      * @return ResponseInterface HTTP response
      */
-    public function handle(ServerRequestInterface $request) : ResponseInterface
+    public function handle(Components $components) : ResponseInterface
     {
         $this->offset++;
         if (isset($this->queue[$this->offset])) {
-            $response = $this->queue[$this->offset]->process($request, $this);
+            $response = $this->queue[$this->offset]->process($components, $this);
         }
         if (!isset($response) || !($response instanceof ResponseInterface)) {
             throw new RuntimeException("No HTTP response were produced by middlewares.");

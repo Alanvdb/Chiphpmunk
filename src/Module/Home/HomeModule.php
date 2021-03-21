@@ -2,7 +2,7 @@
 
 namespace Chiphpmunk\Module\Home;
 
-use Chiphpmunk\Http\ServerRequestInterface;
+use Chiphpmunk\App\Components;
 use Chiphpmunk\Http\ResponseInterface;
 use Chiphpmunk\Module\ModuleInterface;
 use Chiphpmunk\Routing\RouterInterface;
@@ -39,8 +39,8 @@ class HomeModule implements ModuleInterface
      */
     public function __call(string $method, array $arguments) : ResponseInterface
     {
-        if (!($arguments[0] instanceof ServerRequestInterface)) {
-            throw new InvalidArgumentException('Argument must implements ServerRequestInterface.');
+        if (!($arguments[0] instanceof Components)) {
+            throw new InvalidArgumentException('Argument must be a "' . Components::class . '" class.');
         }
         return (new HomeController($arguments[0]))->$method();
     }
