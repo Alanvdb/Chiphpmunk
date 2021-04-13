@@ -246,14 +246,13 @@ class Uri implements UriInterface
      */
     private function encodeComponent(string $component, string $allowedChars) : string
     {
-        $component = preg_replace_callback(
+        return preg_replace_callback(
             '/(?:[^' . $allowedChars . '%]+|%(?![a-fA-F0-9]{2}))/',
             function ($matches) {
                 return rawurlencode($matches[0]);
             },
             $component
         );
-        return $component;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
