@@ -44,7 +44,7 @@ class Uri implements UriInterface
     /**
      * @const int[] DEFAULT_PORTS Default ports by scheme
      */
-    private const DEFAULT_PORTS = [
+    public const DEFAULT_PORTS = [
         'ftp'    => 21,
         'gopher' => 70,
         'http'   => 80,

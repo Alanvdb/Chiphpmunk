@@ -2,6 +2,8 @@
 
 namespace Chiphpmunk\Http;
 
+use Chiphpmunk\Stream\Stream;
+
 use InvalidArgumentException;
 use RuntimeException;
 
@@ -26,16 +28,14 @@ class ClientRequest extends Request
      * @throws InvalidArgumentException On invalid certificate file
      */
     public function __construct(UriInterface $uri, ?string $certificate = null)
-    {
-        $this->uri = $uri;
-        
+    {   
         if ($certificate !== null) {
-            if (is_file($certificate)) {
-                $this->certificate = $certificate;
-            } else {
+            if (!is_file($certificate)) {
                 throw new InvalidArgumentException('Provided argument is not a valid file: "' . $certificate . '".');
             }
+            $this->certificate = $certificate;
         }
+        $this->uri = $uri;
     }
 
     /**
@@ -65,7 +65,6 @@ class ClientRequest extends Request
         if ($this->certificate !== null && !curl_setopt($this->session, CURLOPT_CAINFO, $this->certificate)) {
             throw new RuntimeException('An error occured with provided certificate: ' . curl_error($this->session));
         }
-
         if (!curl_setopt_array($this->session, $this->buildOptions())
             || ($responseBody = curl_exec($this->session)) === false
         ) {
@@ -73,10 +72,10 @@ class ClientRequest extends Request
         }
 
         $response = (new Response())
-            ->withBody($responseBody)
+            ->withBody(new Stream($responseBody))
             ->withStatus(curl_getinfo($this->session, CURLINFO_HTTP_CODE));
         
-        if (($type = curl_getinfo(CURLINFO_CONTENT_TYPE)) !== null) {
+        if (($type = curl_getinfo($this->session, CURLINFO_CONTENT_TYPE)) !== null) {
             $response = $response->withHeader('Content-type', $type);
         }
         return $response;
@@ -102,58 +101,49 @@ class ClientRequest extends Request
      */
     private function buildOptions() : array
     {
-        return array_merge(
-            $this->buildProtocolOptions(),
-            $this->buildMethodOptions(),
-            [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_HEADER         => true
-            ]
-        );
-    }
-
-    /**
-     * Builds protocol version options
-     * 
-     * @return int[]
-     */
-    private function buildProtocolOptions() : array
-    {
-
         $options = [
-            CURLOPT_DEFAULT_PROTOCOL => 'http',
-            CURLOPT_ENCODING         => 'utf-8',
-            CURLOPT_PORT             => 80
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true
         ];
-
-        switch ($this->getProtocolVersion()) {
-            case '1.0':
-                $options[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_0;
-            break;
-            case '1.1':
-                $options[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_1;
-            break;
-            case '2':
-                $options[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_2;
-            break;
-            case '2.0':
-                $options[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_2_0;
-            break;
-            default: break;
-        }
+        $this->catchProtocolOption($options);
+        $this->catchMethodOption($options);
         return $options;
     }
 
     /**
-     * Builds method options
+     * Adds protocol option to provided array
      * 
-     * @return string[] 
+     * @param mixed[] &$options
+     * 
+     * @return void
      */
-    private function buildMethodOptions() : array
+    private function catchProtocolOption(array &$options) : void
     {
-        $options = [];
+        $protocolOption = array_search(
+            $this->getProtocolVersion(),
+            [
+                CURL_HTTP_VERSION_1_0 => '1.0',
+                CURL_HTTP_VERSION_1_1 => '1.1',
+                CURL_HTTP_VERSION_2   => '2',
+                CURL_HTTP_VERSION_2_0 => '2.0'
+            ]
+        );
 
-        if ($method = strtolower($this->getMethod()) !== 'get') {
+        if ($protocolOption !== false) {
+            $options[CURLOPT_HTTP_VERSION] = $protocolOption;
+        }
+    }
+
+    /**
+     * adds method options to provided array
+     * 
+     * @param mixed[] &$options
+     * 
+     * @return void
+     */
+    private function catchMethodOption(array &$options) : void
+    {
+        if (($method = strtolower($this->getMethod())) !== 'get') {
             switch ($method) {
                 case 'post':
                     $options[CURLOPT_POST] = true;
@@ -164,12 +154,10 @@ class ClientRequest extends Request
                 case 'put':
                     $options[CURLOPT_PUT] = true;
                 break;
-                default: break;
-            }
-            if ($method !== 'head') {
-                $options[CURLOPT_CUSTOMREQUEST] = $this->getMethod();
+                default: 
+                    $options[CURLOPT_CUSTOMREQUEST] = $this->getMethod();
+                break;
             }
         }
-        return $options;
     }
 }

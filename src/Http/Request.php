@@ -17,17 +17,17 @@ class Request implements RequestInterface
     /**
      * @var string|null $target HTTP request target
      */
-    private $target;
+    protected $target;
 
     /**
      * @var string $method Request method
      */
-    private $method = 'GET';
+    protected $method = 'GET';
 
     /**
      * @var UriInterface $uri Request URI
      */
-    private $uri;
+    protected $uri;
 
     // =================================================================================================================
     //
