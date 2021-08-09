@@ -8,8 +8,15 @@ use Chiphpmunk\Http\Response;
 use Chiphpmunk\Middleware\DispatcherInterface;
 use Chiphpmunk\Middleware\MiddlewareInterface;
 
+use RuntimeException;
+
 class RoutingMiddleware extends Router implements MiddlewareInterface
 {
+    /**
+     * @const int NOT_FOUND Error code thrown when no route is found
+     */
+    public const NO_ROUTE = 1;
+
     /**
      * Process an HTTP request to produce an HTTP response.
      * If methods is unable to produce the response, it returns the response from $dispatcher
@@ -23,6 +30,10 @@ class RoutingMiddleware extends Router implements MiddlewareInterface
     {
         $request = $components->getRequest();
         $route = $components->getRouter()->catch($request->getMethod(), $request->getUri()->getPath());
+        if ($route === null) {
+            throw new RuntimeException('No route found.', self::NO_ROUTE);
+        }
+        $components->setRequest($request->withQueryParams($route->getParams()));
         $target = $route->getTarget();
         return $target($components);
     }
