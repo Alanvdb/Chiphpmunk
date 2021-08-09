@@ -147,7 +147,7 @@ class Uri implements UriInterface
      *
      * @param string $uri URI in string format
      *
-     * @throws InvalidArgumentException For malformed URI or unsupported URI components
+     * @throws InvalidArgumentException On malformed URI provided
      */
     public function __construct(string $uri = '')
     {
