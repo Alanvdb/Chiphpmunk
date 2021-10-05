@@ -42,6 +42,27 @@ class Uri implements UriInterface
     private const ALLOWED_CHARS_IN_USERINFO = self::UNRESERVED_CHARS . self::SUB_DELIMS;
 
     /**
+     * @const string ALLOWED_CHARS_IN_PATH Allowed characters in path URI component for use in a regex
+     *
+     * @see https://tools.ietf.org/html/rfc3986#section-3.3
+     */
+    private const ALLOWED_CHARS_IN_PATH = self::UNRESERVED_CHARS . self::SUB_DELIMS . ':@\/';
+
+    /**
+     * @const string ALLOWED_CHARS_IN_QUERY Allowed characters in query URI component for use in a regex
+     *
+     * @see https://tools.ietf.org/html/rfc3986#section-3.4
+     */
+    private const ALLOWED_CHARS_IN_QUERY = self::UNRESERVED_CHARS . self::SUB_DELIMS . ':@\/\?';
+
+    /**
+     * @const string ALLOWED_CHARS_IN_FRAGMENT Allowed characters in fragment URI component for use in a regex
+     *
+     * @see https://tools.ietf.org/html/rfc3986#section-3.5
+     */
+    private const ALLOWED_CHARS_IN_FRAGMENT = self::UNRESERVED_CHARS . self::SUB_DELIMS . ':@\/\?';
+
+    /**
      * @const int[] DEFAULT_PORTS Default ports by scheme
      */
     public const DEFAULT_PORTS = [
@@ -64,27 +85,6 @@ class Uri implements UriInterface
      * @see https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
      */
     private const MAX_PORT_NUMBER = 65535;
-
-    /**
-     * @const string ALLOWED_CHARS_IN_PATH Allowed characters in path URI component for use in a regex
-     *
-     * @see https://tools.ietf.org/html/rfc3986#section-3.3
-     */
-    private const ALLOWED_CHARS_IN_PATH = self::UNRESERVED_CHARS . self::SUB_DELIMS . ':@\/';
-
-    /**
-     * @const string ALLOWED_CHARS_IN_QUERY Allowed characters in query URI component for use in a regex
-     *
-     * @see https://tools.ietf.org/html/rfc3986#section-3.4
-     */
-    private const ALLOWED_CHARS_IN_QUERY = self::UNRESERVED_CHARS . self::SUB_DELIMS . ':@\/\?';
-
-    /**
-     * @const string ALLOWED_CHARS_IN_FRAGMENT Allowed characters in fragment URI component for use in a regex
-     *
-     * @see https://tools.ietf.org/html/rfc3986#section-3.5
-     */
-    private const ALLOWED_CHARS_IN_FRAGMENT = self::UNRESERVED_CHARS . self::SUB_DELIMS . ':@\/\?';
 
     // =================================================================================================================
     //
@@ -684,6 +684,22 @@ class Uri implements UriInterface
             }
         }
         return $parsed;
+    }
+
+    /**
+     * Builds query string from provided associative array
+     * 
+     * @param array $params An associative array
+     * 
+     * @return string The builded query string
+     */
+    public static function buildQuery(array $params) : string
+    {
+        $query = '';
+        foreach ($params as $key => $value) {
+            $query .= '&' . $key . '=' . strval($value);
+        }
+        return ltrim($query, '&');
     }
 
     /**
