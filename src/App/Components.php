@@ -4,6 +4,7 @@ namespace Chiphpmunk\App;
 
 use Chiphpmunk\Http\ServerRequestInterface;
 use Chiphpmunk\Routing\RouterInterface;
+use Chiphpmunk\Session\SessionInterface;
 use Chiphpmunk\View\RendererInterface;
 
 use InvalidArgumentException;
@@ -19,6 +20,11 @@ class Components
      * @var RouterInterface $router The application router
      */
     private $router;
+
+    /**
+     * @var SessionInterface|null $session The current session
+     */
+    private $session;
 
     /**
      * @var RendererInterface $renderer The view renderer
@@ -69,6 +75,27 @@ class Components
     public function setRouter(RouterInterface $router) : self
     {
         $this->router = $router;
+        return $this;
+    }
+
+    /**
+     * @return SessionInterface|null The current session
+     */
+    public function getSession() : ?SessionInterface
+    {
+        return $this->session;
+    }
+
+    /**
+     * Sets the current session object
+     * 
+     * @param SessionInterface $session The current session object
+     * 
+     * @return self
+     */
+    public function setSession(SessionInterface $session) : self
+    {
+        $this->session = $session;
         return $this;
     }
 

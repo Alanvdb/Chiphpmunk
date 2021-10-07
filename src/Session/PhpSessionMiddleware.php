@@ -7,7 +7,7 @@ use Chiphpmunk\Http\ResponseInterface;
 use Chiphpmunk\Middleware\MiddlewareInterface;
 use Chiphpmunk\Middleware\DispatcherInterface;
 
-class PhpSessionMiddleware extends PhpSession implements MiddlewareInterface
+class PhpSessionMiddleware implements MiddlewareInterface
 {
     /**
      * Process an HTTP request to produce an HTTP response.
@@ -20,7 +20,7 @@ class PhpSessionMiddleware extends PhpSession implements MiddlewareInterface
      */
     public function process(Components $components, DispatcherInterface $dispatcher) : ResponseInterface
     {
-        $components->setRequest($components->getRequest()->withAttribute('session', $this));
+        $components->setSession(new PhpSession());
         return $dispatcher->handle($components);
     }
 }

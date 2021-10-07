@@ -4,18 +4,8 @@ namespace Chiphpmunk\Session;
 
 use InvalidArgumentException;
 
-class PhpSession implements SessionInterface
+interface SessionInterface
 {
-    /**
-     * Constructor
-     * 
-     * Starts PHP session
-     */
-    public function __construct()
-    {
-        session_start();
-    }
-
     /**
      * Sets session var
      * 
@@ -26,13 +16,7 @@ class PhpSession implements SessionInterface
      * 
      * @return void
      */
-    public function setVar(string $offset, $value) : void
-    {
-        if ($offset === '') {
-            throw new InvalidArgumentException('First argument cannot be empty.');
-        }
-        $_SESSION[$offset] = $value;
-    }
+    public function setVar(string $offset, $value) : void;
 
     /**
      * Retrieve session value from specified offset.
@@ -42,10 +26,7 @@ class PhpSession implements SessionInterface
      * 
      * @return mixed
      */
-    public function getVar(string $offset, $default = null)
-    {
-        return $_SESSION[$offset] ?? $default;
-    }
+    public function getVar(string $offset, $default = null);
 
     /**
      * Returns wether or not provided offset exists
@@ -54,8 +35,5 @@ class PhpSession implements SessionInterface
      * 
      * @return bool
      */
-    public function varExists(string $offset) : bool
-    {
-        return array_key_exists($offset, $_SESSION);
-    }
+    public function varExists(string $offset) : bool;
 }
