@@ -107,6 +107,18 @@ class Response implements ResponseInterface
     // =================================================================================================================
 
     /**
+     * Constructor
+     * 
+     * @param string $content Response body content
+     */
+    public function __construct(string $content = '')
+    {
+        if ($content !== '') {
+            $this->getBody()->write($content);
+        }
+    }
+
+    /**
      * @return int The HTTP response status code.
      */
     public function getStatusCode() : int
