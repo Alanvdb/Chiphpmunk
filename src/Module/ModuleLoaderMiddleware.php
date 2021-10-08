@@ -7,7 +7,7 @@ use Chiphpmunk\Http\ResponseInterface;
 use Chiphpmunk\Middleware\MiddlewareInterface;
 use Chiphpmunk\Middleware\DispatcherInterface;
 use Chiphpmunk\Routing\Router;
-use Chiphpmunk\Module\ModuleInterface;
+use Chiphpmunk\Module\AbstractModule;
 
 use RuntimeException;
 
@@ -42,14 +42,15 @@ class ModuleLoaderMiddleware implements MiddlewareInterface
                 throw new RuntimeException('Cannot retrieve "' . $moduleClass . '" class.');
             }
             $module = new $moduleClass();
-            if (!$module instanceof ModuleInterface) {
+            if (!$module instanceof AbstractModule) {
                 throw new RuntimeException('Module class "' . $moduleClass . '" must implement "' . ModuleInterface::class . '" interface.');
             }
-            $module->mapRoutes($components->getRouter());
-            $module->mapViews($components->getRenderer());
+            if (method_exists($module, 'setup'))
+            {
+                $module->setup($components);
+            }
             $modules[] = $module;
         }
-        $components->setConfig('modules', $modules);
         return $dispatcher->handle($components);
     }
 }
