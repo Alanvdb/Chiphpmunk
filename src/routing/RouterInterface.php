@@ -2,6 +2,8 @@
 
 namespace Chiphpmunk\Routing;
 
+use Chiphpmunk\Http\Uri;
+
 /**
  * The router class must be instanciable without arguments.
  */
@@ -40,7 +42,7 @@ interface RouterInterface
      * If specified name is empty or does not exist.
      * If a provided var name does not exist in route.
      *
-     * @return string|null The generated URI or null if no route was found
+     * @return Uri|null The generated URI or null if no route was found
      */
-    public function buildUri(string $name, array $vars = []) : ?string;
+    public function buildUri(string $name, array $vars = []) : ?Uri;
 }

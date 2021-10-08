@@ -2,6 +2,8 @@
 
 namespace Chiphpmunk\Routing;
 
+use Chiphpmunk\Http\Uri;
+
 use InvalidArgumentException;
 
 class Router implements RouterInterface
@@ -83,9 +85,9 @@ class Router implements RouterInterface
      * If specified name is empty.
      * If a provided var name does not exist in route.
      *
-     * @return string|null The generated URI or null if no route was found
+     * @return Uri|null The generated URI or null if no route was found
      */
-    public function buildUri(string $name, array $vars = []) : ?string
+    public function buildUri(string $name, array $vars = []) : ?Uri
     {
         if ($name === '') {
             throw new InvalidArgumentException('$name argument cannot be empty.');

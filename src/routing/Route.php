@@ -2,6 +2,8 @@
 
 namespace Chiphpmunk\Routing;
 
+use Chiphpmunk\Http\Uri;
+
 use InvalidArgumentException;
 
 class Route
@@ -149,9 +151,9 @@ class Route
      * 
      * @throws InvalidArgumentException If a provided var name does not exists
      * 
-     * @return string
+     * @return Uri
      */
-    public function buildUri(array $vars) : string
+    public function buildUri(array $vars) : Uri
     {
         $uri = $this->pattern;
         foreach ($vars as $name => $value) {
@@ -160,6 +162,6 @@ class Route
             }
             $uri = str_replace('{' . $name . '}', $value, $uri);
         }
-        return $uri;
+        return new Uri($uri);
     }
 }
