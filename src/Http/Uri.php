@@ -672,15 +672,17 @@ class Uri implements UriInterface
     {
         $parsed = [];
 
-        foreach (explode('&', $query) as $pair) {
-            $pair = explode('=', $pair);
+        if ($query !== '') {
+            foreach (explode('&', $query) as $pair) {
+                $pair = explode('=', $pair);
 
-            if (!isset($parsed[$pair[0]])) {
-                $parsed[$pair[0]] = $pair[1] ?? '';
-            } elseif(is_array($parsed[$pair[0]])) {
-                $parsed[$pair[0]][] = $pair[1] ?? '';
-            } else {
-                $parsed[$pair[0]] = [$parsed[$pair[0]], $pair[1] ?? ''];
+                if (!isset($parsed[$pair[0]])) {
+                    $parsed[$pair[0]] = $pair[1] ?? '';
+                } elseif(is_array($parsed[$pair[0]])) {
+                    $parsed[$pair[0]][] = $pair[1] ?? '';
+                } else {
+                    $parsed[$pair[0]] = [$parsed[$pair[0]], $pair[1] ?? ''];
+                }
             }
         }
         return $parsed;
