@@ -4,7 +4,7 @@ namespace Chiphpmunk\Module;
 
 use Chiphpmunk\App\Components;
 
-abstract class Controller
+abstract class AbstractController
 {
     /**
      * @var Components $components Application components
