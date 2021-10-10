@@ -5,6 +5,7 @@ namespace Chiphpmunk\Routing;
 use Chiphpmunk\App\Components;
 use Chiphpmunk\Http\ResponseInterface;
 use Chiphpmunk\Http\Response;
+use Chiphpmunk\http\Uri;
 use Chiphpmunk\Middleware\DispatcherInterface;
 use Chiphpmunk\Middleware\MiddlewareInterface;
 
@@ -33,7 +34,14 @@ class RoutingMiddleware extends Router implements MiddlewareInterface
         if ($route === null) {
             throw new RuntimeException('No route found.', self::NO_ROUTE);
         }
-        $components->setRequest($request->withQueryParams($route->getParams()));
+        $components->setRequest(
+            $request->withQueryParams(
+                array_merge(
+                    Uri::parseQuery($request->getUri()->getQuery()),
+                    $route->getParams()
+                )
+            )
+        );
         $target = $route->getTarget();
         return $target($components);
     }
