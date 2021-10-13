@@ -20,9 +20,9 @@ interface RouterInterface
      * 
      * @throws InvalidArgumentException If $methods argument is an empty string
      * 
-     * @return Route The created route
+     * @return self
      */
-    public function map(string $methods, string $uriPattern, $target, string $name = '') : Route;
+    public function map(string $methods, string $uriPattern, $target, string $name = '') : RouterInterface;
 
     /**
      * @param string $method HTTP method

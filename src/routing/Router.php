@@ -41,9 +41,9 @@ class Router implements RouterInterface
      * 
      * @throws InvalidArgumentException If $methods argument is an empty string
      * 
-     * @return Route The created route
+     * @return self
      */
-    public function map(string $methods, string $uriPattern, $target, string $name = '') : Route
+    public function map(string $methods, string $uriPattern, $target, string $name = '') : RouterInterface
     {
         $route = new Route($methods, $uriPattern, $target);
         if ($name !== '') {
@@ -51,7 +51,7 @@ class Router implements RouterInterface
         } else {
             $this->routes[] = $route;
         }
-        return $route;
+        return $this;
     }
 
     /**
