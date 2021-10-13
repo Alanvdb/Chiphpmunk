@@ -24,14 +24,29 @@ class PhpSession implements SessionInterface
      * 
      * @throws InvalidArgumentException if $offset is empty
      * 
-     * @return void
+     * @return self
      */
-    public function setVar(string $offset, $value) : void
+    public function setVar(string $offset, $value) : SessionInterface
     {
         if ($offset === '') {
             throw new InvalidArgumentException('First argument cannot be empty.');
         }
         $_SESSION[$offset] = $value;
+        return $this;
+    }
+
+    /**
+     * Unsets session var
+     * 
+     * @param string $offset Session var offset
+     * 
+     * @return void
+     */
+    public function unsetVar(string $offset) : void
+    {
+        if (array_key_exists($offset, $_SESSION)) {
+            unset($_SESSION[$offset]);
+        }
     }
 
     /**

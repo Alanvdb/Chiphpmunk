@@ -14,9 +14,18 @@ interface SessionInterface
      * 
      * @throws InvalidArgumentException if $offset is empty
      * 
+     * @return self
+     */
+    public function setVar(string $offset, $value) : SessionInterface;
+
+    /**
+     * Unsets session var
+     * 
+     * @param string $offset Session var offset
+     * 
      * @return void
      */
-    public function setVar(string $offset, $value) : void;
+    public function unsetVar(string $offset) : void;
 
     /**
      * Retrieve session value from specified offset.
