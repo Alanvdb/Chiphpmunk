@@ -26,10 +26,11 @@ class ModuleLoaderMiddleware implements MiddlewareInterface
      */
     public function process(Components $components, DispatcherInterface $dispatcher) : ResponseInterface
     {
-        if (!$components->hasConfig('modules')) {
+        if (!$components->exists('modules')) {
             throw new RuntimeException('Configuration does not contain "modules" offset.');
         }
-        $moduleClasses = $components->getConfig('modules');
+        $moduleClasses = $components->getModules();
+
         if (!is_array($moduleClasses)) {
             throw new RuntimeException('Configuration offset "modules" must contain an array. ' . gettype($moduleClasses) . ' provided.');
         }

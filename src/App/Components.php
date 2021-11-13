@@ -14,34 +14,47 @@ class Components
     /**
      * @var ServerRequestInterface $request The server request
      */
-    private $request;
+    private $items = [];
+
+    // -----------------------------------------------------------------------------------------------------------------
+    //      METHODS
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * @var RouterInterface $router The application router
+     * Retrieves whether or not provided component name exists
+     * 
+     * @param string $componentName The component name
+     * 
+     * @return bool Whether or not component exists
      */
-    private $router;
-
-    /**
-     * @var SessionInterface|null $session The current session
-     */
-    private $session;
-
-    /**
-     * @var RendererInterface $renderer The view renderer
-     */
-    private $renderer;
-
-    /**
-     * @var mixed[] $config The application configuration
-     */
-    private $config = [];
-
-    /**
-     * @return ServerRequestInterface The server request
-     */
-    public function getRequest() : ServerRequestInterface
+    public function exists(string $componentName) : bool
     {
-        return $this->request;
+        return isset($this->items[strtolower($componentName)]);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    //      METHODS > GETTERS & SETTERS
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * __call() magic method
+     * 
+     * @param string $method Method name called
+     * @param mixed[] $arguments Arguments passed to the called method
+     * 
+     * @return mixed
+     */
+    public function __call(string $method, array $arguments)
+    {
+        if (preg_match('`^get`', $method)) {
+            $componentName = strtolower(substr($method, 3));
+            return isset($this->items[$componentName]) ? $this->items[$componentName] : null;
+        }
+        if (preg_match('`^set`', $method)) {
+            $componentName = strtolower(substr($method, 3));
+            $this->items[$componentName] = $arguments[0];
+            return $this;
+        }
     }
 
     /**
@@ -53,16 +66,8 @@ class Components
      */
     public function setRequest(ServerRequestInterface $request) : self
     {
-        $this->request = $request;
+        $this->items['request'] = $request;
         return $this;
-    }
-
-    /**
-     * @return RouterInterface The application router
-     */
-    public function getRouter() : RouterInterface
-    {
-        return $this->router;
     }
 
     /**
@@ -74,16 +79,8 @@ class Components
      */
     public function setRouter(RouterInterface $router) : self
     {
-        $this->router = $router;
+        $this->items['router'] = $router;
         return $this;
-    }
-
-    /**
-     * @return SessionInterface|null The current session
-     */
-    public function getSession() : ?SessionInterface
-    {
-        return $this->session;
     }
 
     /**
@@ -95,16 +92,8 @@ class Components
      */
     public function setSession(SessionInterface $session) : self
     {
-        $this->session = $session;
+        $this->items['session'] = $session;
         return $this;
-    }
-
-    /**
-     * @return RendererInterface The view renderer
-     */
-    public function getRenderer() : RendererInterface
-    {
-        return $this->renderer;
     }
 
     /**
@@ -116,51 +105,7 @@ class Components
      */
     public function setRenderer(RendererInterface $renderer) : self
     {
-        $this->renderer = $renderer;
+        $this->items['renderer'] = $renderer;
         return $this;
-    }
-
-    /**
-     * Retrieves configuration value
-     * 
-     * @param string $offset  Configuration offset name
-     * @param mixed  $default value to return if searched offset does not exist (default to null)
-     * 
-     * @return mixed
-     */
-    public function getConfig(string $offset, $default = null)
-    {
-        return $this->hasConfig($offset) ? $this->config[$offset] : $default;
-    }
-
-    /**
-     * Sets configuration value
-     * 
-     * @param string $offset Configuration offset name
-     * @param mixed  $value  Configuration value
-     * 
-     * @throws InvalidArgumentException if $offset is an empty string
-     * 
-     * @return self
-     */
-    public function setConfig(string $offset, $value) : self
-    {
-        if ($offset === '') {
-            throw new InvalidArgumentException('Provided offset is an empty string.');
-        }
-        $this->config[$offset] = $value;
-        return $this;
-    }
-
-    /**
-     * Returns whether or not provided configuration offset exists
-     * 
-     * @param string $offset Configuration offset name
-     * 
-     * @return bool
-     */
-    public function hasConfig(string $offset) : bool
-    {
-        return array_key_exists($offset, $this->config);
     }
 }

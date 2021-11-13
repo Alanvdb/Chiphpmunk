@@ -56,13 +56,11 @@ class App
             ->setRouter(new Router())
             ->setRenderer(new PhpRenderer());
 
-        try {
-            foreach ($config as $offset => $value) {
-                $components->setConfig($offset, $value);
-            }
-        } catch (Exception $e) {
-            throw new RuntimeException('An error occured loading provided configuration', 0, $e);
+        foreach ($config as $configName => $configValue) {
+            $method = 'set' . (ucfirst($configName));
+            $components->$method($configValue);
         }
+
         return (new Dispatcher(
             new ThrowableHandlerMiddleware(),
             new ModuleLoaderMiddleware(),
